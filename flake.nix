@@ -17,6 +17,7 @@
       in {
         nixosConfigurations.fablaptop = pkgs.nixosSystem {
           inherit system;
+          system = "x86_64-linux";
 
           modules = [
             ./configuration.nix
