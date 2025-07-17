@@ -6,7 +6,7 @@
 set -e
 
 # Konfiguration
-REPO_URL="https://github.com/LUPLUV/fablab-nix-setup.git"  # Anpassen!
+REPO_URL="https://github.com/LUPLUV/fabtop-nix-setup.git"  # Anpassen!
 FABLAB_PASSWORD="fablab"
 FABTOP_PASSWORD="fab90763top"
 
