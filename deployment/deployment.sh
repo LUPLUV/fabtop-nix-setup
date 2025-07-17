@@ -37,7 +37,7 @@ select_hostname() {
     echo "1) fabtop01    2) fabtop02    3) fabtop03    4) fabtop04    5) fabtop05"
     echo "6) fabtop06    7) fabtop07    8) fabtop08    9) fabtop09    10) fabtop10"
     echo "11) Benutzerdefinierten Hostname eingeben"
-    echo
+    echo " "
     read -p "Wähle eine Option (1-11): " choice
     
     case $choice in
