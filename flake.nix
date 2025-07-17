@@ -1,49 +1,31 @@
 {
-  description = "Fablab NixOS Configuration";
+  description = "FabLab Nürnberg laptop flake";
 
   inputs = {
-    nixpkgs.url = "github:NixOS/nixpkgs/nixos-24.11";
+    nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
   };
 
-  outputs = { self, nixpkgs, ... }:
-    let
-      system = "x86_64-linux";
-
-      # Funktion um Laptop-Konfiguration zu erstellen
-      makeLaptopConfig = hostname: nixpkgs.lib.nixosSystem {
-        inherit system;
+  outputs = { self, nixpkgs }: rec {
+    nixosConfigurations = builtins.listToAttrs (map (hostnm: {
+      name = hostnm;
+      value = nixpkgs.lib.nixosSystem {
+        system = "x86_64-linux";
         modules = [
-          ./hardware-configuration.nix
-          ./configuration.nix
-          {
-            networking.hostName = hostname;
-
-            # Hostname-spezifische Konfiguration falls nötig
-            environment.etc."hostname-info".text = ''
-              Laptop: ${hostname}
-              Konfiguration: Fablab Makerspace
-              Erstellt: ${builtins.toString self.lastModified}
-            '';
+          ./modules/user.nix
+          ./modules/gui.nix
+          ./modules/packages.nix
+          ./modules/appimages.nix
+          ./modules/python.nix
+          ./modules/fonts.nix
+          ./modules/snapshots.nix
+          ./services/update-service.nix
+          ./services/snapshot-service.nix
+          { config, pkgs, ... }: {
+            imports = [ ./configurations/touchpad-disable-middle-click.conf ];
+            networking.hostName = hostnm;
           }
         ];
       };
-    in
-    {
-      # Vordefinierte Laptop-Konfigurationen
-      nixosConfigurations = {
-        fabtop01 = makeLaptopConfig "fabtop01";
-        fabtop02 = makeLaptopConfig "fabtop02";
-        fabtop03 = makeLaptopConfig "fabtop03";
-        fabtop04 = makeLaptopConfig "fabtop04";
-        fabtop05 = makeLaptopConfig "fabtop05";
-        fabtop06 = makeLaptopConfig "fabtop06";
-        fabtop07 = makeLaptopConfig "fabtop07";
-        fabtop08 = makeLaptopConfig "fabtop08";
-        fabtop09 = makeLaptopConfig "fabtop09";
-        fabtop10 = makeLaptopConfig "fabtop10";
-      };
-
-      # Standardkonfiguration für neue Laptops
-      nixosConfigurations.default = makeLaptopConfig "fabtop-new";
-    };
+    }) (builtins.mapAttrsToList (name: _: name) (builtins.readDir ./hosts)))
+  };
 }
