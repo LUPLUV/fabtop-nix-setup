@@ -6,7 +6,7 @@
 set -e
 
 # Konfiguration
-REPO_URL="https://github.com/fablabnbg/laptop-config.git"  # Anpassen!
+REPO_URL="https://github.com/LUPLUV/fablab-nix-setup.git"  # Anpassen!
 FABLAB_PASSWORD="fablab"
 FABTOP_PASSWORD="fab90763top"
 
@@ -153,3 +153,30 @@ validate_installation() {
     # Prüfe Hostname
     if [ "$(hostname)" != "$HOSTNAME" ]; then
         warn "Hostname stimmt nicht überein: $(hostname) != $HOSTNAME"
+    fi
+    log "Hostname validiert: $HOSTNAME"
+    # Prüfe Passwort-Hashes
+    if ! grep -q "$FABLAB_HASH" /etc/nixos/configuration.nix; then
+        error "Passwort-Hash für fablab nicht gefunden"
+    fi
+    if ! grep -q "$FABTOP_HASH" /etc/nixos/configuration.nix; then
+        error "Passwort-Hash für fabtop nicht gefunden"
+    fi
+    log "Passwort-Hashes validiert"
+    # Prüfe Systemstatus
+    if ! systemctl is-active --quiet autoUpdate.timer; then
+        error "autoUpdate.timer ist nicht aktiv"
+    fi
+    log "Systemstatus validiert: autoUpdate.timer ist aktiv"
+    # Prüfe AppImages
+    if ! systemctl is-active --quiet appimageDownload; then
+        error "appimageDownload ist nicht aktiv"
+    fi
+    log "AppImages validiert: appimageDownload ist aktiv"
+    # Prüfe Laptop-Info
+    if ! systemctl is-active --quiet laptopInfo; then
+        error "laptopInfo ist nicht aktiv"
+    fi
+    log "Laptop-Info validiert: laptopInfo ist aktiv"
+    log "Installation validiert"
+}
