@@ -2,45 +2,48 @@
   description = "Fablab NixOS Configuration";
 
   inputs = {
-    nixpkgs.url = "github:NixOS/nixpkgs/nixos-23.05";
-    flake-utils.url = "github:numtide/flake-utils";
+    nixpkgs.url = "github:NixOS/nixpkgs/nixos-24.11";
   };
 
-  outputs = { self, nixpkgs, flake-utils, ... }:
-    flake-utils.lib.eachDefaultSystem (system:
-      let
-        pkgs = import nixpkgs { inherit system; };
-        lib = pkgs.lib;
+  outputs = { self, nixpkgs, ... }:
+    let
+      system = "x86_64-linux";
 
-        # Funktion zum sicheren Passwort Hashen
-        hashedPass = password: lib.mkPassword password;
-      in {
-        nixosConfigurations.fablaptop = pkgs.nixosSystem {
-          system = "x86_64-linux";
+      # Funktion um Laptop-Konfiguration zu erstellen
+      makeLaptopConfig = hostname: nixpkgs.lib.nixosSystem {
+        inherit system;
+        modules = [
+          ./hardware-configuration.nix
+          ./configuration.nix
+          {
+            networking.hostName = hostname;
 
-          modules = [
-            ./configuration.nix
+            # Hostname-spezifische Konfiguration falls nötig
+            environment.etc."hostname-info".text = ''
+              Laptop: ${hostname}
+              Konfiguration: Fablab Makerspace
+              Erstellt: ${builtins.toString self.lastModified}
+            '';
+          }
+        ];
+      };
+    in
+    {
+      # Vordefinierte Laptop-Konfigurationen
+      nixosConfigurations = {
+        fabtop01 = makeLaptopConfig "fabtop01";
+        fabtop02 = makeLaptopConfig "fabtop02";
+        fabtop03 = makeLaptopConfig "fabtop03";
+        fabtop04 = makeLaptopConfig "fabtop04";
+        fabtop05 = makeLaptopConfig "fabtop05";
+        fabtop06 = makeLaptopConfig "fabtop06";
+        fabtop07 = makeLaptopConfig "fabtop07";
+        fabtop08 = makeLaptopConfig "fabtop08";
+        fabtop09 = makeLaptopConfig "fabtop09";
+        fabtop10 = makeLaptopConfig "fabtop10";
+      };
 
-            # Weitere Module falls gewünscht
-          ];
-
-          configuration = {
-            # Basis System und User Konfiguration
-            users.users.fablab = {
-              isNormalUser = true;
-              extraGroups = [ "dialout" "netdev" "audio" "plugdev" ];
-              hashedPassword = hashedPass "fablab";
-            };
-
-            users.users.fabtop = {
-              isNormalUser = true;
-              extraGroups = [ "wheel" "networkmanager" "docker" ];
-              hashedPassword = hashedPass "fab90763top";
-              openssh.authorizedKeys.keys = [
-                # "ssh-ed25519 AAAAC3... deine keys hier"
-              ];
-            };
-          };
-        };
-      });
+      # Standardkonfiguration für neue Laptops
+      nixosConfigurations.default = makeLaptopConfig "fabtop-new";
+    };
 }
