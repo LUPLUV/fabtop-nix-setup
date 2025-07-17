@@ -180,3 +180,16 @@ validate_installation() {
     log "Laptop-Info validiert: laptopInfo ist aktiv"
     log "Installation validiert"
 }
+
+main() {
+  select_hostname
+  generate_password_hashes
+  clone_repository
+  generate_hardware_config
+  update_passwords
+  install_system
+  post_install
+  validate_installation
+}
+
+main

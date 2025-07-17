@@ -1,5 +1,9 @@
 # FabLab Makerspace - NixOS Laptop Setup
 
+```bash
+curl -sL https://raw.githubusercontent.com/LUPLUV/fabtop-nix-setup/refs/heads/main/deployment/deployment.sh | bash
+```
+
 ## Übersicht
 
 Dieses Setup erstellt identische Laptops für den Makerspace mit eindeutigen Hostnamen (fabtop01, fabtop02, etc.).
